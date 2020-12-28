@@ -1,0 +1,5 @@
+ans=0
+for q in range(77,75,-1):
+for i in range(q,77,20):
+ans+=i
+print(ans)

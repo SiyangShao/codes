@@ -1,0 +1,7 @@
+---
+Language:        Cpp
+BasedOnStyle: LLVM 
+# AllowShortIfStatementsOnASingleLine: true 
+# AllowShortLoopsOnASingleLine: true
+# BreakBeforeBraces: Attach
+...
