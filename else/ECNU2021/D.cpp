@@ -1,32 +1,47 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int mod = 1e9+7;
-long long f[10000010];
-int main(){
-    f[0]=1;
-    for(int i = 1 ; i<= 10000000 ; i++){
-        f[i] = f[i-1]*i%mod;
+const int MAXN = 1e7 + 7;
+int prime[MAXN];
+bool vis[MAXN];
+int _ , a , b , c, d , cnt;
+void init() {
+	memset(vis, 0, sizeof(vis));
+	for (int i = 2; i < MAXN; i++) {
+		if (!vis[i])
+			prime[cnt++] = i;
+		for (int j = 0; j < cnt && i * prime[j] < MAXN; j++) {
+			vis[i * prime[j]] = 1;
+			if (i % prime[j] == 0) 
+				break;
+		}
+	}
+}
+int get(int x , int p){
+    int ans = 0;
+    long long now = p;
+    while(x/now){
+        ans += x/now;
+        now=now*p;
     }
-    int q;
-    cin>>q;
-    while(q--){
-        int a,b,c,d , q1 ,q2;
-        cin>>a>>b>>c>>d;
-        if(f[b]<f[a-1]){
-            q1 = f[b]*mod/f[a-1];
-        }else{
-            q1 = f[b]/f[a-1];
-        }
-        if(f[d]<f[c-1]){
-            q2 = f[d]*mod/f[c-1];
-        }else{
-            q2=f[d]/f[c-1];
-        }
-        cout<<q1<<" "<<q2;
-        if(q2%q1==0){
-            cout<<"Yes\n";
-        }else{
+    return ans;
+}
+void solve(){
+    for(int i = 0 ; i < cnt ; i++){
+        int p = prime[i];
+        int ans1 = get(d,p)+get(a-1,p);
+        int ans2 = get(b,p)+get(c-1,p);
+        if(ans1<ans2){
             cout<<"No\n";
+            return;
         }
+    }
+    cout<<"Yes\n";
+}
+int main() {
+    init();
+    scanf("%d",&_);
+    while(_--){
+        scanf("%d%d%d%d",&a,&b,&c,&d);
+        solve();
     }
 }
