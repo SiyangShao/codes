@@ -23,5 +23,5 @@ int main(){
 			cout<<i<<" ";
 		}
 	}
-	cout<<ans;
+	//cout<<ans;
 }
