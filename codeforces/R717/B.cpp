@@ -1,23 +1,33 @@
 #include <bits/stdc++.h>
 using namespace std;
-int pre[2005];
-int main() {
-	int t;
-	scanf("%d", &t);
-	while (t--) {
-		int n;
-		scanf("%d", &n);
-		for (int i = 1; i <= n; i++) {
-			int a;
-			scanf("%d", &a);
-			pre[i] = (pre[i - 1] ^ a);
+int t , n , tmp , qa;
+int a[2001];
+int main(){
+	cin>>t;
+	while(t--){
+		cin>>n;
+		tmp=0;
+		for(int i = 1 ; i<= n ; i++){
+			cin>>qa;
+			tmp^=qa;
+			a[i]=a[i-1]^qa;
 		}
-		bool yes = !pre[n];
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j < n; j++)
-				yes |= (pre[i] == (pre[j] ^ pre[i]) &&
-						pre[i] == (pre[n] ^ pre[j]));
+		// for(int i = 1 ; i<=n ; i++){
+		// 	cout<<(a[i]^a[i-1])<<" ";
+		// }
+		if(tmp==0){
+			cout<<"YES\n";
+		}else{
+			for(int i = 1 ; i< n ; i++){
+				for(int j = i+1 ;j<= n ; j++){
+					if(int(a[n]^a[j]) == int(a[j]^a[i]) &&  int(a[j]^a[i]) == int(a[i]^a[0])){
+						cout<<"YES\n";
+						goto flag;
+					}
+				}
+			}
+			cout<<"NO\n";
+			flag:;
 		}
-		puts(yes ? "YES" : "NO");
 	}
 }
