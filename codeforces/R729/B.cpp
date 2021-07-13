@@ -1,24 +1,30 @@
 #include <bits/stdc++.h>
-typedef long long ll;
 using namespace std;
-int main() {
-    ll T;
-    ll n, a, b, base;
-    bool flag;
-    scanf("%lld", &T);
-    while (T--) {
-        scanf("%lld%lld%lld", &n, &a, &b);
-        base = 1;
-        flag = false;
-        for (ll i = 1; i <= 30 && base <= n; i++, base *= a) {
-            if ((n - base) % b == 0) {
-                flag = true;
-                break;
-            }
+#define int long long
+int x, a, b;
+inline bool judge() {
+    if(x==1||b==1||x%b==1) return true;
+    if(a==1){
+        if(x%b==1) return true;
+        else return false;
+    }
+    for (int base = 1 , i = 1; i<=30,base <= x; ++i,base *= a) {
+        if ((x - base) % b == 0) {
+            return true;
         }
-        if (flag)
+    }
+    return false;
+}
+signed main() {
+    int _;
+    scanf("%lld",&_);
+    while (_--) {
+        scanf("%lld %lld %lld", &x, &a, &b);
+        if (judge()) {
             printf("Yes\n");
-        else
+        }
+        else {
             printf("No\n");
+        }
     }
 }
