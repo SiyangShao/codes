@@ -1,24 +1,30 @@
 #include <bits/stdc++.h>
 using namespace std;
+typedef long long ll;
+const ll INF = 1e18;
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(0), cout.tie(0);
-	int t, n;
+	ll t = 1;
 	cin >> t;
 	while (t--) {
-		priority_queue<int, vector<int>, greater<int>> q;
+		int n;
 		cin >> n;
-		int ans = 0, add = 0;
-		for (int i = 1, tmp; i <= n; ++i) {
-			cin >> tmp;
-			q.push(tmp);
+		vector<ll> a(n);
+		for (int i = 0, tmp; i < n; ++i) {
+			cin >> a[i];
 		}
-		int now = 0;
-		if (q.size() == 1) {
-			cout << q.top() << "\n";
-		} else {
-			while (!q.empty()) {
-			}
+		// for (auto i : a) {
+		// 	cout << i << " ";
+		// }
+		// puts("");
+		sort(a.begin(), a.end());
+		bool flag = false;
+		ll tire = 0, ans = -INF;
+		for (auto i : a) {
+			ans = max(ans, i - tire);
+			tire += (i - tire);
 		}
+		cout << ans << "\n";
 	}
 }

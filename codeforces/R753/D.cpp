@@ -1,52 +1,46 @@
 #include <bits/stdc++.h>
 using namespace std;
-int t, n;
-string s;
-int x[200010];
+typedef long long ll;
+ll t, n;
 int main() {
-	// ios::sync_with_stdio(false);
-	// cin.tie(0), cout.tie(0);
+	ios::sync_with_stdio(false);
+	cin.tie(0), cout.tie(0);
 	cin >> t;
 	while (t--) {
 		cin >> n;
-		for (int i = 1; i <= n; ++i) {
-			cin >> x[i];
+		vector<ll> a(n);
+		for (auto &i : a) {
+			cin >> i;
 		}
+		string s;
 		cin >> s;
-		priority_queue<int> b;
-		priority_queue<int, vector<int>, greater<int>> a;
-		for (int i = 1; i <= n; ++i) {
-			if (s[i - 1] == 'B') {
-				x[i] = min(n, x[i]);
-				b.push(x[i]);
+		vector<ll> red, blue;
+		for (auto i = 0; i < n; ++i) {
+			if (s[i] == 'R') {
+				red.push_back(a[i]);
 			} else {
-				x[i] = max(1, x[i]);
-				a.push(x[i]);
+				blue.push_back(a[i]);
 			}
 		}
-		// cout << b.size() << " " << a.size() << "\n";
-		// cout << b.top() << " " << a.top() << "\n";
-		// cout << n - b.top() << " " << a.size() << "\n";
-		if (a.size() == 0) {
-			if (b.top() == n) {
-				puts("YES");
+		sort(red.begin(), red.end());
+		sort(blue.begin(), blue.end());
+		ll cnt = 1;
+		auto i = red.begin(), j = blue.begin();
+		auto flag = true;
+		for (auto cnt = 1ll; cnt <= n; ++cnt) {
+			if (j < blue.end() && *j >= cnt) {
+				j++;
+			} else if (i < red.end() && *i <= cnt) {
+				i++;
 			} else {
-				puts("NO");
+				flag = false;
+				break;
 			}
-		} else if (b.size() == 0) {
-			if (a.top() == 1) {
-				puts("YES");
-			} else {
-				puts("NO");
-			}
-		} else if (b.top() < a.top()) {
-			puts("NO");
+		}
+		if (flag) {
+			puts("YES");
 		} else {
-			if (((a.top() - 1) > b.size()) || ((n - b.top()) > a.size())) {
-				puts("NO");
-			} else {
-				puts("YES");
-			}
+			puts("NO");
 		}
 	}
 }
