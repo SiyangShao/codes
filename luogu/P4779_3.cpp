@@ -1,28 +1,27 @@
 #include <bits/stdc++.h>
 using namespace std;
 const int maxn = 1e5 + 7;
+struct edge {
+	int v, w;
+};
+vector<edge> e[maxn];
 int dis[maxn], vis[maxn];
-vector<pair<int, int>> e[maxn];
-priority_queue<pair<int, int>> q;
+priority_queue<pair<int,int>> q;
 void dijkstra(int n, int s) {
 	memset(dis, 63, sizeof(dis));
 	dis[s] = 0;
 	q.push({0, s});
 	while (!q.empty()) {
-		// want the smallest begin
 		int u = q.top().second;
 		q.pop();
 		if (vis[u])
 			continue;
 		vis[u] = 1;
 		for (auto ed : e[u]) {
-			int v = ed.first, w = ed.second;
+			int v = ed.v, w = ed.w;
 			if (dis[v] > dis[u] + w) {
 				dis[v] = dis[u] + w;
 				q.push({-dis[v], v});
-				// cause in priority queue, first larger one begin
-				// we push - dis[v] to ensure
-				// it's the nearst begin point
 			}
 		}
 	}
@@ -30,11 +29,13 @@ void dijkstra(int n, int s) {
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(0), cout.tie(0);
-	int n, m, s;
+	int n, s, m;
 	cin >> n >> m >> s;
-	for (int i = 1, u, v, w; i <= m; ++i) {
+	for (int i = 0, u, v, w; i < m; ++i) {
 		cin >> u >> v >> w;
-		e[u].push_back({v, w});
+		edge tmp;
+		tmp.v = v, tmp.w = w;
+		e[u].push_back(tmp);
 	}
 	dijkstra(n, s);
 	for (int i = 1; i <= n; ++i) {
