@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "vector": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "utility": "cpp"
     }
 }
