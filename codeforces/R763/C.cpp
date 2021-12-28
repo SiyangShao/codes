@@ -126,7 +126,7 @@ void solve() {
 		if (judge(mid)) {
 			l = mid;
 		} else {
-			r = mid;
+			r = mid - 1;
 		}
 	}
 	cout << l << "\n";
