@@ -30,15 +30,15 @@ int query(int x, int y) {
 	return ans;
 }
 void solve() {
-	memset(c, 0, sizeof(c));
-	memset(a, 0, sizeof(a));
-	memset(b, 0, sizeof(b));
+    cin >> n;
 	for (int i = N - n; i <= N - 1; ++i) {
 		while (!d[i].empty()) {
 			d[i].pop();
 		}
 	}
-	cin >> n;
+	for(int i = 1; i<=n; ++i){
+	    c[i] = 0;
+	}
 	for (int i = 1; i <= n; ++i) {
 		cin >> a[i];
 		a[i] = N - a[i];
