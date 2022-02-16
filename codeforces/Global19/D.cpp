@@ -9,12 +9,12 @@ void solve() {
 	ll sum = 0, cnt = 0;
 	for (auto &i : a) {
 		cin >> i;
-		sum += 2 * i * i;
+		sum += (n - 2) * i * i;
 		cnt += i;
 	}
 	for (auto &i : b) {
 		cin >> i;
-		sum += 2 * i * i;
+		sum += (n - 2) * i * i;
 		cnt += i;
 	}
 	if (n == 1) {
