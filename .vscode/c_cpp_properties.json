@@ -10,11 +10,10 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "C:\\Program Files\\LLVM\\bin\\clang++.exe",
+            "compilerPath": "/usr/bin/clang++",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-clang-x86"
+            "intelliSenseMode": "linux-clang-x64"
         }
     ],
     "version": 4
