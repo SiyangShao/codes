@@ -3,6 +3,10 @@
         "vector": "cpp",
         "utility": "cpp",
         "chrono": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ios": "cpp",
+        "xtree": "cpp",
+        "algorithm": "cpp",
+        "xhash": "cpp"
     }
 }
