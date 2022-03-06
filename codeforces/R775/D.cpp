@@ -1,46 +1,30 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
-inline bool judge(int x, int bs, unordered_map<ll, int> &vis) {
-    int tmp = 1;
-    while (x >= tmp) {
-        if (vis[x] != 0 || vis[x / tmp] != 0)
-            return false;
-        tmp *= bs;
-    }
-    return true;
-}
+ll n, c;
+vector<ll> vis, cnt, a;
 void solve() {
-    ll n, c;
     cin >> n >> c;
-    vector<ll> a(n);
-    unordered_map<ll, int> vis;
+    vis.assign(c + 1, 0);
+    cnt.assign(c + 1, 0);
+    a.resize(n);
     for (auto &i : a) {
         cin >> i;
         vis[i] = 1;
+        cnt[i]++;
     }
-    sort(a.begin(), a.end());
-    // judge for any x,y in a, x > y, x/y is in c or not
-    if (a[0] != 1) {
-        cout << "No\n";
-        return;
+    for (int i = 1; i <= c; ++i) {
+        cnt[i] += cnt[i - 1];
     }
-    ll m = -1;
-    for (auto i : a) {
-        if (i != 1) {
-            m = i;
-            break;
-        }
-    }
-    if (m == -1) {
-        cout << "Yes\n";
-        return;
-    }
-    for (auto i : a) {
-        if (!judge(i, m, vis)) {
-            cout << "No\n";
-            return;
-        }
+    for (ll i = 1; i <= c; ++i) {
+        if (vis[i] == 1)
+            for (ll j = 1; i * j <= c; ++j) {
+                ll l = i * j, r = min(i * (j + 1), c + 1);
+                if (cnt[r - 1] - cnt[l - 1] > 0 && vis[j] != 1) {
+                    cout << "No\n";
+                    return;
+                }
+            }
     }
     cout << "Yes\n";
 }
