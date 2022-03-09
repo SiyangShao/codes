@@ -1,88 +1,38 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
-ll n, t;
+ll n, d;
 vector<ll> a;
-inline bool reassign(int x, ll d) {
-    if (x == 0)
-        return false;
-    for (int i = 1; i <= n; ++i) {
-        if (i == x)
-            continue;
-        if (i - 1 == x) {
-            if (a[i] - a[i - 2] - 1 < d) {
-                return false;
-            }
-            continue;
-        }
-        if (a[i] - a[i - 1] - 1 < d) {
-            return false;
-        }
+ll cnt(ll min_pos) {
+    if (min_pos <= 0) {
+        return 0;
     }
+    vector<ll> schedule;
     for (int i = 0; i <= n; ++i) {
-        if (i == x)
-            continue;
-        if (i == n) {
-            if (t - a[i] - 1 >= d) {
-                return true;
-            }
-        }
-        if (i + 1 != x) {
-            if (a[i + 1] - a[i] - 1 >= d + d + 1) {
-                return true;
-            }
-        } else {
-            if (i + 1 == n) {
-                if (t - a[i] - 1 >= d + d + 1) {
-                    return true;
-                }
-            } else {
-                if (a[i + 2] - a[i] - 1 >= d + d + 1) {
-                    return true;
-                }
-            }
+        if (i != min_pos) {
+            schedule.emplace_back(a[i]);
         }
     }
-    return false;
+    ll mx = 0, mn = INT_MAX;
+    for (int i = 1; i < n; ++i) {
+        mx = max(mx, schedule[i] - schedule[i - 1] - 1);
+        mn = min(mn, schedule[i] - schedule[i - 1] - 1);
+    }
+    return min(mn, max(d - schedule.back() - 1, (mx - 1) / 2));
 }
-inline bool check(ll x) {
-    int cnt = -1;
-    bool flag = true;
-    for (int i = 1; i <= n; ++i) {
-        if (a[i] - a[i - 1] - 1 < x) {
-            cnt = i;
-            flag = false;
-            break;
-        }
-    }
-    if (flag) {
-        return true;
-    }
-    return reassign(cnt - 1, x) || reassign(cnt, x);
-}
+
 void solve() {
-    cin >> n >> t;
-    a.assign(n + 2, 0);
-    a[0] = 0;
+    cin >> n >> d;
+    a.assign(n + 1, 0);
+    ll mn = d, min_pos = 0;
     for (int i = 1; i <= n; ++i) {
         cin >> a[i];
-    }
-    ll l = 0, r = t;
-    ll ans = 0;
-    while (l <= r) {
-        ll mid = (l + r) >> 1;
-        // cout << mid << " ";
-        if (check(mid)) {
-            l = mid + 1;
-            ans = max(ans, mid);
-        } else {
-            r = mid - 1;
+        if (a[i] - a[i - 1] - 1 < mn) {
+            mn = a[i] - a[i - 1] - 1;
+            min_pos = i;
         }
     }
-    if (check(ans + 1)) {
-        ans = ans + 1;
-    }
-    cout << ans << "\n";
+    cout << max(cnt(min_pos), cnt(min_pos - 1)) << "\n";
 }
 int main() {
     ios::sync_with_stdio(false);
