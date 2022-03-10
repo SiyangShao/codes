@@ -8,6 +8,8 @@
         "xtree": "cpp",
         "algorithm": "cpp",
         "xhash": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "xiosbase": "cpp",
+        "initializer_list": "cpp"
     }
 }
