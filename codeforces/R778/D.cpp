@@ -1,63 +1,70 @@
 #include <bits/stdc++.h>
-#include <climits>
 using namespace std;
-typedef long long ll;
-constexpr ll MOD = 998244353;
-constexpr ll N = 2e5 + 7;
-int n;
-vector<pair<ll, pair<ll, ll>>> E[N];
-pair<ll, ll> val[N];
-void dfs(ll u) {
-    for (auto &[v, w] : E[u]) {
-        if (val[v].second == 0) {
-            auto x = val[u].first * w.second ;
-            auto y = val[u].second * w.first;
-            auto z = gcd(x, y);
-            x /= z, y /= z;
-            x %= MOD, y %= MOD;
-            val[v] = {x, y};
-            dfs(v);
-        }
+using ll = long long;
+constexpr ll N = 200010, MOD = 998244353;
+ll t, n, sum = 0, pre[N], cnt[N], ans[N];
+vector<ll> fac[N];
+vector<array<ll, 3>> e[N];
+ll qpow(ll x, ll y) {
+    return y ? qpow(x * x % MOD, y >> 1) * (y & 1 ? x : 1) % MOD : 1;
+}
+void dfs(ll x, ll fa) {
+    for (auto i : e[x]) {
+        ll y = i[0], a = i[1], b = i[2];
+        if (y == fa)
+            continue;
+        for (auto k : fac[b])
+            cnt[k]++;
+        for (auto k : fac[a])
+            ans[k] = max(ans[k], -(--cnt[k]));
+        dfs(y, x);
+        for (auto k : fac[a])
+            cnt[k]++;
+        for (auto k : fac[b])
+            cnt[k]--;
     }
 }
-pair<ll, ll> add(pair<ll, ll> x, pair<ll, ll> y) {
-    ll up = (x.first * y.second + x.second * y.first) % MOD;
-    ll down = x.second * y.second % MOD;
-    // ll z = gcd(up, down);
-    // up /= z, down /= z;
-    // up %= MOD, down %= MOD;
-    return {up, down};
-}
-void solve() {
-    cin >> n;
-    for (int i = 1; i <= n; ++i) {
-        E[i].clear();
-        val[i] = {0, 0};
+void solve(ll x, ll fa, ll val) {
+    sum = (sum + val) % MOD;
+    for (auto i : e[x]) {
+        ll y = i[0], a = i[1], b = i[2];
+        if (y == fa)
+            continue;
+        solve(y, x, val * qpow(a, MOD - 2) % MOD * b % MOD);
     }
-    for (ll i = 1, u, v, x, y; i < n; ++i) {
-        cin >> u >> v >> x >> y;
-        E[u].push_back({v, {x, y}});
-        E[v].push_back({u, {y, x}});
-    }
-    val[1] = {1, 1};
-    dfs(1);
-    pair<ll, ll> ans = {1, 1};
-    // cout << "\n";
-    // for (int i = 1; i <= n; ++i) {
-    //     cout << val[i].first << " " << val[i].second << "\n";
-    // }
-    for (int i = 2; i <= n; ++i) {
-        ans = add(ans, val[i]);
-    }
-    auto tmp = gcd(ans.first, ans.second);
-    cout << ans.first / tmp << "\n";
 }
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr), cout.tie(nullptr);
-    int _ = 1;
-    cin >> _;
-    while (_--) {
-        solve();
+    for (int i = 2; i < N; i++)
+        if (!pre[i])
+            for (int j = i; j < N; j += i)
+                pre[j] = i;
+    for (int i = 1; i < N; i++) {
+        int t = i;
+        while (t > 1)
+            fac[i].push_back(pre[t]), t /= pre[t];
     }
+    cin >> t;
+    while (t--) {
+        cin >> n;
+        for (int i = 1; i <= n; i++) {
+            cnt[i] = ans[i] = 0;
+            e[i].clear();
+        }
+        for (int i = 1; i < n; i++) {
+            int x, y, a, b;
+            cin >> x >> y >> a >> b;
+            e[x].push_back({y, a, b});
+            e[y].push_back({x, b, a});
+        }
+        dfs(1, 0);
+        auto res = 1ll;
+        for (int i = 1; i <= n; i++)
+            res = res * qpow(i, ans[i]) % MOD;
+        sum = 0;
+        solve(1, 0, res);
+        cout << sum << '\n';
+    }
+    return 0;
 }
