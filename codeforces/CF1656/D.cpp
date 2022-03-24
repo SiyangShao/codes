@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-using ll = long long;
+using ll = __int128;
 constexpr ll INF = 1e18;
 vector<ll> twopow;
 auto init() {
@@ -11,7 +11,7 @@ auto init() {
     }
 }
 auto solve() {
-    ll n;
+    long long n;
     cin >> n;
     if (n % 2 == 1) {
         cout << "2\n";
@@ -26,12 +26,13 @@ auto solve() {
         cout << "-1\n";
         return;
     }
-    if ((twopow[cnt] + 1) * twopow[cnt] <= 2 * n) {
-        cout << twopow[cnt] << "\n";
+    if ((twopow[cnt] + 1) * twopow[cnt] <= ll(2) * ll(n)) {
+        // cout << (twopow[cnt] + 1) * twopow[cnt] << " ";
+        cout << (long long)(twopow[cnt]) << "\n";
         return;
     } else {
         assert((tmp + 1) * tmp <= 2 * n);
-        cout << tmp << "\n";
+        cout << (long long)(tmp) << "\n";
     }
 }
 auto main() -> int {
