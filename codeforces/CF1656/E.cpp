@@ -18,7 +18,7 @@ auto solve() {
             if (v == fa)
                 continue;
             self(self, v, u, x == 0 ? 1 : -x);
-            ans[u] -= x == 0 ? 1LL : -x;
+            ans[u] -= x == 0 ? 1 : -x;
         }
     };
     dfs(dfs, 0, -1, 0);
