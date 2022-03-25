@@ -1,2 +1,2 @@
 # codes
-Coding Details
+Coding
