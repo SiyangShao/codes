@@ -1,17 +1,17 @@
-#include <bits/stdc++.h>
-using namespace std;
+#include <iostream>
+#include <vector>
 using ll = long long;
 auto solve() {
     ll n;
-    cin >> n;
-    vector<vector<ll>> E(n);
+    std::cin >> n;
+    std::vector<std::vector<ll>> E(n);
     for (ll i = 1, u, v; i < n; ++i) {
-        cin >> u >> v;
+        std::cin >> u >> v;
         u--, v--;
         E[u].push_back(v);
         E[v].push_back(u);
     }
-    vector<ll> ans(n);
+    std::vector<ll> ans(n);
     auto dfs = [&](auto self, auto u, auto fa, auto x) -> void {
         ans[u] = x;
         for (auto v : E[u]) {
@@ -23,15 +23,15 @@ auto solve() {
     };
     dfs(dfs, 0, -1, 0);
     for (auto i : ans) {
-        cout << i << " ";
+        std::cout << i << " ";
     }
-    cout << "\n";
+    std::cout << "\n";
 }
 auto main() -> int {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr), cout.tie(nullptr);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr), std::cout.tie(nullptr);
     int _;
-    cin >> _;
+    std::cin >> _;
     while (_--) {
         solve();
     }
