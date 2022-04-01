@@ -1,87 +1,94 @@
-#include <bits/stdc++.h>
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <iostream>
+#include <unordered_map>
 using namespace std;
-using ll = long long;
-auto cal(vector<pair<ll, ll>> &num) -> pair<ll, pair<ll, ll>> {
-    ll res = 1;
-    auto n = num.size();
-    for (auto &&[i, pos] : num) {
-        res *= i;
-    }
-    if (res > 0) {
-        return {res, {num[0].second, num[n - 1].second}};
-    }
-    ll L = -1, R = n, LL = 1, RR = 1;
-    for (ll i = 0; i < n; ++i) {
-        LL *= num[i].first;
-        if (num[i].first < 0) {
-            L = i;
-            break;
+using LL = long long;
+using PII = pair<int, int>;
+constexpr int N = 2e5 + 10;
+array<int, N> a;
+int n;
+auto get(int &x, int &y, int l, int r) -> int {
+    if (l == r) {
+        if (a[l] <= 1)
+            return 0;
+        else {
+            x = l - 1, y = r + 1;
+            return 1;
         }
     }
-    for (ll i = n - 1; i >= 0; --i) {
-        RR *= num[i].first;
-        if (num[i].first < 0) {
-            R = i;
-            break;
-        }
+    int sum = 0, cnt = 0;
+    for (int i = l; i <= r; i++) {
+        if (abs(a[i]) == 2)
+            sum++;
+        if (a[i] < 0)
+            cnt++;
     }
-    // cout << res << ", " << LL << ", " << L << ":" << RR << ", " << R << "...
-    // "; if (res / LL > res / RR) {
-    //     return {res / LL, {num[L].second, num[n - 1].second}};
-    // } else {
-    //     return {res / RR, {num[0].second, num[R].second}};
-    // }
-    if ((L + 1 >= n || L + 1 < 0) && (R - 1 < 0 || R - 1 >= n)) {
-        return {res, {num[0].second, num[n - 1].second}};
-    } else if (L + 1 >= n || L + 1 < 0) {
-        return {res / RR, {num[0].second, num[R - 1].second}};
-    } else if (R - 1 < 0 || R - 1 >= n) {
-        return {res / LL, {num[L + 1].second, num[n - 1].second}};
+    if (!sum)
+        return sum;
+    if (cnt % 2 == 0) {
+        x = l - 1, y = r + 1;
+        return sum;
+    }
+
+    int i = l, j = r;
+
+    int lsum = 0;
+    int rsum = 0;
+    while (i <= j && a[i] > 0)
+        if (abs(a[i++]) == 2)
+            lsum++;
+    while (i <= j && a[j] > 0)
+        if (abs(a[j--]) == 2)
+            rsum++;
+
+    if (a[i] == -2)
+        lsum++;
+    if (a[j] == -2)
+        rsum++;
+
+    if (lsum <= rsum) {
+        sum -= lsum;
+        l = i + 1;
     } else {
-        if (res / LL > res / RR) {
-            return {res / LL, {num[L + 1].second, num[n - 1].second}};
-        } else {
-            return {res / RR, {num[0].second, num[R - 1].second}};
-        }
+        sum -= rsum;
+        r = j - 1;
     }
+
+    x = l - 1, y = r + 1;
+    return sum;
 }
-auto solve() {
-    ll n;
-    cin >> n;
-    vector<ll> a(n);
-    vector<pair<ll, ll>> b;
-    vector<vector<pair<ll, ll>>> c;
-    b.clear(), c.clear();
-    for (ll i = 0; i < n; ++i) {
-        cin >> a[i];
-        if (a[i] == 0) {
-            if (!b.empty())
-                c.emplace_back(b);
-            b.clear();
-        } else {
-            b.emplace_back(a[i], i);
+
+auto solve() -> PII {
+    int last = 0;
+    int l = 0, r = n;
+    int val = 0;
+    int x, y;
+    for (int i = 1; i <= n + 1; i++) {
+        if (a[i])
+            continue;
+        if (i - last == 1) {
+            last = i;
+            continue;
         }
+        int t = get(x, y, last + 1, i - 1);
+        if (t > val)
+            l = x, r = n - y + 1, val = t;
+        last = i;
     }
-    if (!b.empty())
-        c.emplace_back(b);
-    ll res = 1, L = 0, R = -1;
-    for (auto i : c) {
-        auto [tmp, range] = cal(i);
-        // cout << tmp << "??? ";
-        if (tmp > res) {
-            res = tmp;
-            L = range.first, R = range.second;
-            // cout << L << " " << R << "?";
-        }
-    }
-    cout << L << " " << n - 1 - R << "\n";
+    return {l, r};
 }
 auto main() -> int {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr), cout.tie(nullptr);
-    int _ = 1;
-    cin >> _;
-    while (_--) {
-        solve();
+    int T;
+    cin >> T;
+    while (T--) {
+        cin >> n;
+        for (int i = 1; i <= n; i++)
+            cin >> a[i];
+        a[n + 1] = 0;
+        PII res = solve();
+        cout << res.first << " " << res.second << "\n";
     }
+    return 0;
 }
