@@ -4,49 +4,31 @@ using ll = long long;
 auto solve() {
     ll n;
     cin >> n;
-    vector<int> a(n);
+    vector<ll> a(n);
+    vector<vector<ll>> pos(n);
+    pos.assign(n, vector<ll>());
     for (auto &i : a) {
         cin >> i;
+        i--;
     }
-    vector<int> ans(n);
-    vector<int> bug;
-    vector<queue<int>> pos(n + 1);
     for (int i = 0; i < n; ++i) {
-        ans[i] = a[(i + 1) % n];
-        if (ans[i] == a[i]) {
-            bug.emplace_back(i);
-        } else {
-            pos[ans[i]].emplace(i);
+        pos[a[i]].emplace_back(i);
+    }
+    size_t maxi = 0;
+    vector<ll> p, inv(n);
+    for (auto &v : pos) {
+        maxi = max(maxi, v.size());
+        for (auto x : v) {
+            p.emplace_back(x);
         }
     }
-    sort(bug.begin(), bug.end(), [&](int i, int j) { return a[i] < a[j]; });
-    int l = 0, r = 0;
-    for (auto b : bug) {
-        auto now = a[b];
-        r = max(r, now + 1);
-        while (pos[r].empty()) {
-            r++;
-        }
-        while (pos[l].empty()) {
-            l++;
-        }
-        if (r <= n && !pos[r].empty()) {
-            auto p = pos[r].front();
-            pos[r].pop();
-            swap(ans[b], ans[p]);
-            continue;
-        }
-
-        if (l < now && !pos[l].empty()) {
-            auto p = pos[l].front();
-            pos[l].pop();
-            swap(ans[b], ans[p]);
-        }
+    for (int i = 0; i < n; ++i) {
+        inv[p[i]] = i;
     }
-    for (auto i : ans) {
-        cout << i << " ";
+    sort(a.begin(), a.end());
+    for (int i = 0; i < n; ++i) {
+        cout << a[(inv[i] + maxi) % n] + 1 << " \n"[i == n - 1];
     }
-    cout << "\n";
 }
 
 auto main() -> int {
