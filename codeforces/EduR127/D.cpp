@@ -14,17 +14,12 @@ auto solve() {
     for (int i = 1; i < n; ++i) {
         cnt += abs(a[i] - a[i - 1]);
     }
-    ll mn = min(a[0] - 1, a[n - 1] - 1);
-    for (int i = 0; i < n; ++i) {
-        mn = min(mn, 2 * (a[i] - 1));
-    }
+    auto mi = *min_element(a.begin(), a.end());
+    auto mn = min({abs(mi - 1) * 2, abs(a[0] - 1), abs(a[n - 1] - 1)});
     cnt += mn;
     auto mx = *max_element(a.begin(), a.end());
     if (mx < x) {
-        mn = min(x - a[0], x - a[n - 1]);
-        for (int i = 0; i < n; ++i) {
-            mn = min(mn, 2 * (x - a[i]));
-        }
+        mn = min({abs(x - mx) * 2, abs(x - a[0]), abs(x - a[n - 1])});
         cnt += mn;
     }
     cout << cnt << "\n";
