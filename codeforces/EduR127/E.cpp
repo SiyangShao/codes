@@ -1,69 +1,144 @@
+// #pragma GCC optimize(2)
+// #pragma GCC optimize(3)
 #include <bits/stdc++.h>
 using namespace std;
-using ll = long long;
-constexpr ll MOD = 998244353;
-constexpr ll MMOD = 1000000007;
-auto solve() {
-    ll n;
-    cin >> n;
-    n = 1 << n;
-    n--;
-    string s;
-    cin >> s;
-    vector<ll> mp(n + 1);
-    for (int i = 1; i <= n; ++i) {
-        if (s[i - 1] == 'A') {
-            mp[i] = 1;
-        } else {
-            mp[i] = 0;
-        }
-    }
-    vector<ll> dp(n + 1), level(n + 1);
-    vector<pair<ll, ll>> hash(n + 1);
-    dp.assign(n + 1, 0);
-    hash.assign(n + 1, {0, 0});
-    level.assign(n + 1, 0);
-    auto dfs = [&](auto self, auto i) {
-        if (i * 2 > n) {
-            dp[i] = 1;
-            level[i] = 1;
-            return hash[i] = {mp[i], mp[i]};
-        }
-        auto lson = self(self, i * 2);
-        auto rson = self(self, i * 2 + 1);
-        level[i] = level[i * 2] + level[i * 2 + 1] + 1;
-        if (lson == rson) {
-            dp[i] = dp[i * 2] * dp[i * 2 + 1] % MOD;
-            ll res = (1 << (level[i] - 1)) * mp[i] +
-                     lson.first * (1 << level[i * 2 + 1]) + rson.first;
-            res %= MOD;
-            ll tmp = (1 << (level[i] - 1)) * mp[i] +
-                     lson.second * (1 << level[i * 2 + 1]) + rson.second;
-            tmp %= MMOD;
-            return hash[i] = {res, tmp};
-        } else {
-            dp[i] = 2 * dp[i * 2 + 1] * dp[i * 2] % MOD;
-            if (lson.first > rson.first) {
-                swap(lson, rson);
-            }
-            ll res = (1 << (level[i] - 1)) * mp[i] +
-                     lson.first * (1 << level[i * 2 + 1]) + rson.first;
-            res %= MOD;
-            ll tmp = (1 << (level[i] - 1)) * mp[i] +
-                     lson.second * (1 << level[i * 2 + 1]) + rson.second;
-            tmp %= MMOD;
-            return hash[i] = {res, tmp};
-        }
-    };
-    dfs(dfs, 1);
-    cout << dp[1] << "\n";
+
+#define fi first
+#define se second
+#define pb push_back
+#define endl '\n'
+#define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
+#define caseT                                                                  \
+    int CaseT;                                                                 \
+    cin >> CaseT;                                                              \
+    for (int _Case = 1; _Case <= CaseT; _Case++)
+#define IOS                                                                    \
+    ios::sync_with_stdio(false);                                               \
+    cin.tie(0);                                                                \
+    cout.tie(0);                                                               \
+    cout << fixed << setprecision(12)
+
+using LL = long long;
+using PII = pair<int, int>;
+using PDD = pair<double, double>;
+using ULL = unsigned long long;
+
+mt19937 mrand(random_device{}());
+LL rnd(LL x) { return mrand() % x; }
+LL power(int a, int b, int p = 998244353) {
+    LL ret = 1;
+    for (; b; b >>= 1, a = 1ll * a * a % p)
+        if (b & 1)
+            ret = ret * a % p;
+    return ret;
 }
-auto main() -> int {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr), cout.tie(nullptr);
-    int _ = 1;
-    // cin >> _;
-    while (_--) {
-        solve();
+constexpr int P = 998244353;
+
+// assume -p <= x < 2P
+int norm(int x) {
+    if (x < 0) {
+        x += P;
     }
+    if (x >= P) {
+        x -= P;
+    }
+    return x;
+}
+template <class T> T power(T a, int b) {
+    T res = 1;
+    for (; b; b >>= 1, a *= a)
+        if (b & 1)
+            res *= a;
+    return res;
+}
+struct Z {
+    int x;
+    Z(int x = 0) : x(norm(x)) {}
+    [[nodiscard]] int val() const { return x; }
+    Z operator-() const { return (norm(P - x)); }
+    [[nodiscard]] Z inv() const {
+        assert(x != 0);
+        return power(*this, P - 2);
+    }
+    Z &operator*=(const Z &rhs) {
+        x = (long long)(x)*rhs.x % P;
+        return *this;
+    }
+    Z &operator+=(const Z &rhs) {
+        x = norm(x + rhs.x);
+        return *this;
+    }
+    Z &operator-=(const Z &rhs) {
+        x = norm(x - rhs.x);
+        return *this;
+    }
+    Z &operator/=(const Z &rhs) { return *this *= rhs.inv(); }
+    friend Z operator*(const Z &lhs, const Z &rhs) {
+        Z res = lhs;
+        res *= rhs;
+        return res;
+    }
+    friend Z operator+(const Z &lhs, const Z &rhs) {
+        Z res = lhs;
+        res += rhs;
+        return res;
+    }
+    friend Z operator-(const Z &lhs, const Z &rhs) {
+        Z res = lhs;
+        res -= rhs;
+        return res;
+    }
+    friend Z operator/(const Z &lhs, const Z &rhs) {
+        Z res = lhs;
+        res /= rhs;
+        return res;
+    }
+    friend istream &operator>>(istream &input, Z &lhs) {
+        input >> lhs.x;
+        return input;
+    }
+    friend ostream &operator<<(ostream &output, const Z &lhs) {
+        output << lhs.val();
+        return output;
+    }
+};
+
+int multi_cases = 0;
+
+void solve() {
+    int n;
+    string s;
+    cin >> n >> s;
+    s = " " + s;
+    int tot = 1 << n;
+    vector<Z> f(1 << (n + 1), 1LL);
+
+    function<string(int)> dfs = [&](int u) -> string {
+        if (u >= (1 << n))
+            return "";
+        if (u * 2 >= tot)
+            return string("") + s[u];
+
+        string lson = dfs(u << 1);
+        string rson = dfs(u << 1 | 1);
+        f[u] = f[u << 1] * f[u << 1 | 1] * (lson != rson ? 2 : 1);
+        if (lson > rson)
+            swap(lson, rson);
+        return string("") + s[u] + lson + rson;
+    };
+
+    dfs(1);
+    cout << f[1] << endl;
+}
+
+int main() {
+
+    IOS;
+    int _ = 1;
+    if (multi_cases)
+        cin >> _;
+    for (; _; _--)
+        solve();
+    return 0;
 }
