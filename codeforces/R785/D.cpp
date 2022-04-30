@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 using ll = long long;
-using i128 = __int128;
 constexpr ll MOD = 1e9 + 7;
 auto solve() {
     ll b, q, y, c, r, z;
@@ -10,12 +9,11 @@ auto solve() {
         cout << "0\n";
         return;
     }
-    i128 B = b, Q = q, Y = y, C = c, R = r, Z = z;
-    if (C < B || C + R * (Z - 1) > B + Q * (Y - 1) || (C - B) % q != 0) {
+    if (c < b || c + r * (z - 1) > b + q * (y - 1) || (c - b) % q != 0) {
         cout << "0\n";
         return;
     }
-    if (C + R * Z > B + Q * (Y - 1) || C - R < B) {
+    if (c + r * z > b + q * (y - 1) || c - r < b) {
         cout << "-1\n";
         return;
     }
@@ -30,13 +28,15 @@ auto solve() {
     //     }
     // }
     // cout << cnt << "\n";
-    ll cnt = 0;
-    for (int i = 1; i <= sqrt(q); ++i) {
+    ll cnt = 0, base = r / q;
+    for (int i = 1; i * i <= q; ++i) {
         if (q % i == 0) {
-            cnt = (cnt + (i * i) % MOD) % MOD;
             auto res = q / i;
-            if (res != i) {
-                cnt = (cnt + (res * res) % MOD) % MOD;
+            if (lcm(res * base, q) == r)
+                cnt = (cnt + i * i) % MOD;
+            if (i != res) {
+                if (lcm(i * base, q) == r)
+                    cnt = (cnt + res * res) % MOD;
             }
         }
     }
