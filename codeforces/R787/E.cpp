@@ -6,32 +6,29 @@ auto solve() {
     cin >> n >> k;
     string s;
     cin >> s;
-    ll cnt = 0;
-    char re = 'a', pre = 'a';
+    char high = 'a', low = 'a', ans = 'z';
     for (auto i : s) {
-        ll res = i - 'a';
-        if (res <= cnt) {
-            cout << "a";
-            continue;
-        }
-        if (k == -1) {
-            if (i <= pre) {
-                cout << min(re, i);
+        if (k <= 0) {
+            if (i <= low) {
+                cout << "a";
+            } else if (i <= high) {
+                cout << min(i, ans);
             } else {
                 cout << i;
             }
             continue;
         }
-        if (res - cnt <= k) {
-            auto tmp = res - cnt;
-            k -= res - cnt;
-            cnt = tmp;
+        if (i <= low) {
+            cout << "a";
+        } else if (i - low <= k) {
+            k -= i - low;
+            low = i;
             cout << "a";
         } else {
-            cout << char(i - k);
-            re = char(i - k);
-            pre = i;
-            k = -1;
+            high = i;
+            ans = high - k;
+            k = 0;
+            cout << ans;
         }
     }
     cout << "\n";
