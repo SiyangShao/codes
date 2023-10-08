@@ -7,7 +7,9 @@
 #endif
 using namespace std;
 using ll = long long;
-auto solve() {}
+auto solve() {
+  
+}
 auto main() -> int {
   ios::sync_with_stdio(false);
   cin.tie(nullptr), cout.tie(nullptr);

@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <chrono>
 // #define ONLINE_JUDGE
 #ifndef ONLINE_JUDGE
 #include "dbg.h"
@@ -18,47 +17,62 @@ void build(vector<vector<int>> &E, vector<int> &size, int u) {
     size[u] += size[v];
   }
 }
-vector<int> Hierholzer(vector<set<int>> &E, int start) {
-  vector<int> ans;
-  stack<int> st;
-  st.emplace(start);
-  while (!st.empty()) {
-    auto u = st.top();
-    if (E[u].empty()) {
-      st.pop();
-      ans.emplace_back(u);
-    } else {
-      int v = *E[u].begin();
-      E[v].erase(u);
-      E[u].erase(v);
-      st.emplace(v);
-    }
+struct DSU {
+  vector<int> fa;
+  DSU(int n) : fa(n) { iota(fa.begin(), fa.end(), 0); }
+  int find(int u) {
+    if (u != fa[u])
+      fa[u] = find(fa[u]);
+    return fa[u];
   }
-  return ans;
+  void merge(int u, int v) {
+    u = find(u), v = find(v);
+    fa[u] = v;
+  }
+};
+stack<int> st;
+void dfs(int u, vector<set<int>> &E) {
+  while (!E[u].empty()) {
+    int v = *E[u].begin();
+    E[u].erase(v), E[v].erase(u);
+    dfs(v, E);
+  }
+  st.emplace(u);
 }
-vector<vector<int>> Hier(vector<set<int>> &E) {
-  vector<bool> vis(E.size(), false);
-  vector<vector<int>> ans;
-  for (int i = 0; i < (int)E.size(); ++i) {
-    if (E[i].size() % 2 == 1 && !vis[i]) {
-      auto tmp = Hierholzer(E, i);
-      ans.emplace_back(tmp);
-      for (auto j : tmp) {
-        vis[j] = true;
+pair<bool, vector<int>> check(vector<int> &node, vector<set<int>> &E, int k,
+                              int n, int m) {
+  if (node.empty()) {
+    return {true, {}};
+  }
+  while (!st.empty())
+    st.pop();
+  int u = -1, v = -1, start = node[0];
+  for (auto i : node) {
+    if (i >= k) {
+      start = i;
+    }
+    if (E[i].size() % 2 == 1) {
+      if (u == -1) {
+        u = i;
+      } else if (v == -1) {
+        v = i;
+      } else {
+        return {false, {}};
       }
     }
   }
-  for (int i = 0; i < (int)E.size(); ++i) {
-    if (!vis[i]) {
-      auto tmp = Hierholzer(E, i);
-      tmp.pop_back();
-      ans.emplace_back(tmp);
-      for (auto j : tmp) {
-        vis[j] = true;
-      }
-    }
+  if (u != -1 && u != n - 1 && u != n + m - k - 1) {
+    return {false, {}};
   }
-  return ans;
+  if (u == -1)
+    u = start;
+  dfs(u, E);
+  vector<int> vec;
+  while (!st.empty()) {
+    vec.emplace_back(st.top());
+    st.pop();
+  }
+  return {true, vec};
 }
 auto solve() {
   int n, m;
@@ -82,47 +96,71 @@ auto solve() {
   }
   build(En, sizen, n - 1);
   build(Em, sizem, m - 1);
-
   int k = 0;
   while (k + 1 < min(n, m)) {
-    if (sizen[k] != 1 || sizem[k] != 1) {
+    if (!En[k].empty() || !Em[k].empty()) {
       break;
     }
     k++;
   }
   vector<set<int>> E(n + m - k);
-  for (int u = 0; u < n; ++u) {
+
+  DSU dsu(n + m - k);
+  for (int u = k; u < n; ++u) {
     for (auto v : En[u]) {
       if (sizen[v] % 2 == 0)
         continue;
       E[u].emplace(v);
       E[v].emplace(u);
+      dsu.merge(u, v);
     }
   }
-  for (int i = 0; i < m; ++i) {
-    int u = (i < k ? i : i - k + n);
+  for (int i = k; i < m; ++i) {
+    int u = i - k + n;
     for (auto v : Em[i]) {
       if (sizem[v] % 2 == 0)
         continue;
+      if (v >= k) {
+        v = v - k + n;
+      }
       E[u].emplace(v);
       E[v].emplace(u);
+      dsu.merge(u, v);
     }
   }
-  auto ans = Hier(E);
-  dbg(ans);
+  vector<vector<int>> node(n + m - k);
+  for (int i = 0; i < n + m - k; ++i) {
+    node[dsu.find(i)].emplace_back(i);
+  }
+  for (int i = 0; i < k; ++i) {
+    assert(E[i].size() == 2);
+  }
+  dbg(k);
+  dbg(node);
   vector<int> col(k);
-  for (auto &i : ans) {
-    for (int j = 0; j < (int)i.size(); ++j) {
-      int nxt = i[(j + 1) % i.size()];
-      if (nxt < k) {
-        if (i[j] < n) {
-          col[nxt] = 1;
+  for (int i = 0; i < n + m - k; ++i) {
+    auto [flag, vec] = check(node[i], E, k, n, m);
+    if (!flag) {
+      cout << "IMPOSSIBLE\n";
+      return;
+    }
+    for (int j = 0; j < (int)vec.size(); ++j) {
+      // cout << vec[j] << " ";
+      if (vec[j] < k) {
+        int prev = j - 1;
+        if (j == 0) {
+          prev = (int)vec.size() - 1;
+        }
+        prev = vec[prev];
+        if (prev < n) {
+          col[vec[j]] = 1;
         }
       }
     }
+    // cout << "\n";
   }
-  for (auto i : col) {
-    if (i)
+  for (int i = 0; i < k; ++i) {
+    if (col[i])
       cout << "R";
     else
       cout << "B";
