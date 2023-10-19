@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.as": "asm-intel-x86-generic",
+    "array": "cpp"
+  }
+}
