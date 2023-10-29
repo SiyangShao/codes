@@ -1,4 +1,10 @@
 #include <bits/stdc++.h>
+// #define ONLINE_JUDGE
+#ifndef ONLINE_JUDGE
+#include "dbg.h"
+#else
+#define dbg(...) (__VA_ARGS__)
+#endif
 using namespace std;
 using ll = long long;
 template <class S, S (*op)(S, S), S (*e)(), class F, S (*mapping)(F, S),
@@ -149,8 +155,8 @@ public:
 
 private:
   int _n{}, size{}, log{};
-  vector<S> d;
-  vector<F> lz;
+  std::vector<S> d;
+  std::vector<F> lz;
   void update(int k) { d[k] = op(d[2 * k], d[2 * k + 1]); }
   void all_apply(int k, F f) {
     d[k] = mapping(f, d[k]);
@@ -178,14 +184,76 @@ node mapping(F f, node x) { return node{x.sum + f * x.len, x.len}; }
 F composition(F f, F g) { return F{f + g}; } // f(g())
 F id() { return F{0}; }
 auto solve() {
-  ll n, q;
-  cin >> n >> q;
-  vector<node> a(n);
+  int n;
+  cin >> n;
+  vector<int> a(n), pos(n);
   for (auto &i : a) {
-    cin >> i.sum;
-    i.len = 1;
+    cin >> i;
+    i--;
   }
-  lazy_segtree<node, op, e, F, mapping, composition, id> seg(a);
+  for (int i = 0; i < n; ++i) {
+    pos[a[i]] = i;
+  }
+  set<int> st;
+  st.emplace(-1);
+  st.emplace(n);
+  vector<int> lef(n), rig(n), y(n);
+  for (int i = n - 1; i >= 0; --i) {
+    st.emplace(pos[i]);
+    auto it = st.find(pos[i]);
+    auto pre = prev(it);
+    auto nxt = next(it);
+    lef[i] = *pre + 1;
+    rig[i] = *nxt;
+  }
+  st.clear();
+  for (int i = 0; i < n; ++i) {
+    st.emplace(pos[i]);
+    auto nxt = st.upper_bound(rig[i]);
+    if (nxt == st.end()) {
+      y[i] = n;
+    } else {
+      y[i] = *nxt;
+    }
+  }
+
+  vector<vector<tuple<int, int, int>>> lef_point(n + 1);
+  lazy_segtree<node, op, e, F, mapping, composition, id> seg(n);
+  for (int i = 0; i < n; ++i) {
+    seg.set(i, {0, 1});
+    // cout << lef[i] << " " << pos[i] << " " << rig[i] << " " << y[i] << "\n";
+    lef_point[lef[i]].emplace_back(rig[i], y[i], 1);
+    lef_point[pos[i] + 1].emplace_back(rig[i], y[i], -1);
+  }
+  int q;
+  cin >> q;
+  vector<vector<pair<int, int>>> ask(n);
+  vector<int> ans(q);
+  for (int i = 0; i < q; ++i) {
+    int l, r;
+    cin >> l >> r;
+    l--, r--;
+    ask[l].emplace_back(r, i);
+  }
+  for (int i = 0; i < n; ++i) {
+    for (auto [l, r, label] : lef_point[i]) {
+      seg.apply(l, r, label);
+    }
+    for (auto [r, id] : ask[i]) {
+      auto [sum, len] = seg.get(r);
+      if (sum > 0) {
+        ans[id] = 1;
+      } else {
+        ans[id] = 0;
+      }
+    }
+  }
+  for (auto i : ans) {
+    if (i)
+      cout << "Yes\n";
+    else
+      cout << "No\n";
+  }
 }
 auto main() -> int {
   ios::sync_with_stdio(false);

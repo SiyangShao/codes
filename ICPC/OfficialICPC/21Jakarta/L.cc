@@ -168,31 +168,68 @@ private:
     return x;
   }
 };
-struct node {
-  ll sum, len;
-};
-node op(node l, node r) { return node{l.sum + r.sum, l.len + r.len}; }
-node e() { return node{0, 0}; }
+using node = ll;
+node op(node l, node r) { return max(l, r); }
+constexpr ll inf = 1e9;
+node e() { return -inf; }
 using F = long long;
-node mapping(F f, node x) { return node{x.sum + f * x.len, x.len}; }
-F composition(F f, F g) { return F{f + g}; } // f(g())
-F id() { return F{0}; }
-auto solve() {
-  ll n, q;
-  cin >> n >> q;
-  vector<node> a(n);
-  for (auto &i : a) {
-    cin >> i.sum;
-    i.len = 1;
-  }
-  lazy_segtree<node, op, e, F, mapping, composition, id> seg(a);
-}
-auto main() -> int {
+node mapping(F f, node x) { return max(f, x); }
+F composition(F f, F g) { return max(f, g); }
+F id() { return -inf; }
+int main() {
   ios::sync_with_stdio(false);
   cin.tie(nullptr), cout.tie(nullptr);
-  int _ = 1;
-  // cin >> _;
-  while (_--) {
-    solve();
+  int n, k;
+  ll d;
+  cin >> n >> k >> d;
+  vector<ll> h(n);
+  vector<int> T(n - 1);
+  for (auto &i : h) {
+    cin >> i;
+  }
+  for (auto &i : T) {
+    cin >> i;
+  }
+  using lsg = lazy_segtree<node, op, e, F, mapping, composition, id>;
+  if (k >= 350) {
+    lsg seg(n);
+    seg.set(0, 0);
+    for (int i = 0; i + 1 < n; ++i) {
+      h[i] += seg.get(i);
+      ll cost = 0;
+      for (int beg = 0; beg < T[i]; beg += k) {
+        // cerr << beg + i << " " << min(beg + k + i, T[i] + i + 1) << " "
+        //  << h[i] - cost << "\n";
+        seg.apply(beg + i, min(beg + k + i, T[i] + i + 1), h[i] - cost);
+        cost += d;
+      }
+    }
+    cout << h[n - 1] + seg.get(n - 1) << "\n";
+  } else {
+    const int w = (n + k - 1) / k;
+    vector<lsg> seg(k, lsg(w + 10));
+    seg[0].set(0, 0);
+    for (int i = 0; i < n; ++i) {
+      h[i] += seg[i % k].get(i / k) - d * (i / k);
+      if (i == n - 1)
+        break;
+      int beg = i, end = T[i] + i;
+      for (int j = 0; j < k; ++j) {
+        int real_beg = beg - (beg % k) + j;
+        if (real_beg < beg) {
+          real_beg += k;
+        }
+        if (real_beg > end)
+          continue;
+        int real_end = end - (end % k) + j;
+        if (real_end > end) {
+          real_end -= k;
+        }
+        // real_beg: h[i] + 0 = sth - d * real_beg / k
+        ll sth = h[i] + d * (real_beg / k);
+        seg[j].apply(real_beg / k, real_end / k + 1, sth);
+      }
+    }
+    cout << h[n - 1] << "\n";
   }
 }

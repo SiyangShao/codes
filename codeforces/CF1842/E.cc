@@ -1,4 +1,10 @@
 #include <bits/stdc++.h>
+// #define ONLINE_JUDGE
+#ifndef ONLINE_JUDGE
+#include "dbg.h"
+#else
+#define dbg(...) (__VA_ARGS__)
+#endif
 using namespace std;
 using ll = long long;
 template <class S, S (*op)(S, S), S (*e)(), class F, S (*mapping)(F, S),
@@ -168,24 +174,37 @@ private:
     return x;
   }
 };
-struct node {
-  ll sum, len;
-};
-node op(node l, node r) { return node{l.sum + r.sum, l.len + r.len}; }
-node e() { return node{0, 0}; }
-using F = long long;
-node mapping(F f, node x) { return node{x.sum + f * x.len, x.len}; }
+
+using node = ll;
+node op(node l, node r) { return max(l, r); }
+node e() { return 0; }
+using F = ll;
+node mapping(F f, node x) { return f + x; }
 F composition(F f, F g) { return F{f + g}; } // f(g())
 F id() { return F{0}; }
 auto solve() {
-  ll n, q;
-  cin >> n >> q;
-  vector<node> a(n);
-  for (auto &i : a) {
-    cin >> i.sum;
-    i.len = 1;
+  int n, k, A;
+  cin >> n >> k >> A;
+  vector<tuple<int, int, int>> point(n);
+  ll ans = 0;
+  vector<vector<pair<int, int>>> E(k + 1);
+  for (auto &[x, y, c] : point) {
+    cin >> x >> y >> c;
+    ans += c;
+    E[k - y].emplace_back(x, c);
   }
-  lazy_segtree<node, op, e, F, mapping, composition, id> seg(a);
+  dbg(E);
+  lazy_segtree<node, op, e, F, mapping, composition, id> seg(k + 1);
+  vector<ll> dp(k + 1);
+  for (int r = 1; r <= k; ++r) {
+    for (auto [x, c] : E[r]) {
+      seg.apply(0, x + 1, c);
+    }
+    dp[r] = max(dp[r - 1], seg.prod(0, r) - (ll)r * A);
+    seg.set(r, dp[r] + (ll) r * A);
+  }
+  dbg(dp);
+  cout << ans - dp[k] << "\n";
 }
 auto main() -> int {
   ios::sync_with_stdio(false);
