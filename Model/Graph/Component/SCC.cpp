@@ -12,21 +12,17 @@ struct Tarjan_SCC {
     sc_id = edg_id = _t = 0;
   }
   void addEdge(int u, int v) {
-    edges.emplace_back(u, v), E[u].emplace_back(edg_id);
-    // E[v].emplace_back(edg_id);
-    edg_id++;
+    edges.emplace_back(u, v), E[u].emplace_back(edg_id++);
   }
   void dfs(int u) {
     low[u] = dfn[u] = _t++;
     st.emplace(u), in_st[u] = true;
     for (auto id : E[u]) {
       auto v = edges[id].second;
-      if (dfn[v] == -1) {
-        dfs(v);
-        low[u] = min(low[u], low[v]);
-      } else if (in_st[v]) {
+      if (dfn[v] == -1)
+        dfs(v), low[u] = min(low[u], low[v]);
+      else if (in_st[v])
         low[u] = min(low[u], dfn[v]);
-      }
     }
     if (dfn[u] == low[u]) {
       vector<int> _scc;
@@ -43,10 +39,7 @@ struct Tarjan_SCC {
     }
   }
   void solve() {
-    for (int i = 0; i < n; ++i) {
-      if (dfn[i] == -1) {
-        dfs(i);
-      }
-    }
+    for (int i = 0; i < n; ++i)
+      if (dfn[i] == -1) dfs(i);
   }
 };

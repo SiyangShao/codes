@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 template <class Flow> struct dinic {
+  static constexpr Flow inf = 1e16;
   struct edge {
     int u, v;
     Flow f;
@@ -27,12 +28,10 @@ template <class Flow> struct dinic {
         auto add = dfs(v, t, c);
         sum += add, flow -= add, edg[id].f -= add, edg[id ^ 1].f += add;
       }
-      if (!flow)
-        break;
+      if (!flow) break;
       cur[u]++;
     }
-    if (!sum)
-      d[u] = -1;
+    if (!sum) d[u] = -1;
     return sum;
   }
   bool level(int s, int t) {
@@ -44,16 +43,14 @@ template <class Flow> struct dinic {
       Q.pop();
       for (auto id : E[u]) {
         auto v = edg[id].v;
-        if (d[v] == -1 && edg[id].f != 0)
-          Q.emplace(v), d[v] = d[u] + 1;
+        if (d[v] == -1 && edg[id].f != 0) Q.emplace(v), d[v] = d[u] + 1;
       }
     }
     return d[t] != -1;
   }
   auto solve(int s, int t) {
     Flow ans = 0;
-    while (level(s, t))
-      ans += dfs(s, t, numeric_limits<Flow>::max());
+    while (level(s, t)) ans += dfs(s, t, inf);
     return ans;
   }
 };

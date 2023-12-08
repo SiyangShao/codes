@@ -16,40 +16,30 @@ struct heavy_light_decomposition {
   int tree_build(int u) {
     siz[u] = 1;
     for (auto v : E[u]) {
-      if (v == fa[u]) {
-        continue;
-      }
+      if (v == fa[u]) continue;
       fa[v] = u;
       dep[v] = dep[u] + 1;
       siz[u] += tree_build(v);
-      if (son[u] == -1 || siz[v] > siz[son[u]]) {
-        son[u] = v;
-      }
+      if (son[u] == -1 || siz[v] > siz[son[u]]) son[u] = v;
     }
     return siz[u];
   }
   void tree_decomposition(int u, int tp) {
-    top[u] = tp;
-    dfn[u] = ++tot;
-    rnk[tot] = u;
+    top[u] = tp, dfn[u] = ++tot, rnk[tot] = u;
     if (son[u] != -1) {
       tree_decomposition(son[u], tp);
       for (auto v : E[u]) {
-        if (v == son[u] || v == fa[u]) {
-          continue;
-        }
+        if (v == son[u] || v == fa[u]) continue;
         tree_decomposition(v, v);
       }
     }
   }
   auto lca(int u, int v) {
-    while (top[u] != top[v]) {
-      if (dep[top[u]] > dep[top[v]]) {
+    while (top[u] != top[v])
+      if (dep[top[u]] > dep[top[v]])
         u = fa[top[u]];
-      } else {
+      else
         v = fa[top[v]];
-      }
-    }
     return dep[u] > dep[v] ? v : u;
   }
 };

@@ -19,25 +19,21 @@ struct Tarjan_BCC {
     low[u] = dfn[u] = _t++;
     for (auto id : E[u]) {
       auto v = edges[id].first ^ edges[id].second ^ u;
-      if (id == fa_id)
-        continue;
+      if (id == fa_id) continue;
       if (dfn[v] != -1) {
         low[u] = min(low[u], dfn[v]);
       } else {
         fa[v] = u;
         dfs(v, id);
         child[u].emplace_back(v), low[u] = min(low[u], low[v]);
-        if (low[v] >= dfn[u])
-          cut[u] = true;
+        if (low[v] >= dfn[u]) cut[u] = true;
       }
     }
-    if (fa_id == -1)
-      cut[u] = child[u].size() > 1;
+    if (fa_id == -1) cut[u] = child[u].size() > 1;
   }
   void solve() {
     for (int i = 0; i < n; ++i) {
-      if (dfn[i] == -1)
-        dfs(i, -1);
+      if (dfn[i] == -1) dfs(i, -1);
     }
   }
   bool is_cut(int u) { return cut[u]; }
@@ -64,8 +60,7 @@ struct Tarjan_BCC {
     };
     for (int i = 0; i < n; ++i) {
       if (!vis[i]) {
-        if (child[i].empty())
-          BCC.emplace_back(vector{i});
+        if (child[i].empty()) BCC.emplace_back(vector{i});
         dfs(i);
       }
     }
@@ -75,8 +70,7 @@ struct Tarjan_BCC {
     return is_bridge(edges[id].first, edges[id].second);
   }
   bool is_bridge(int u, int v) { // assert there's an edge u-v
-    if (dfn[u] > dfn[v])
-      swap(u, v);
+    if (dfn[u] > dfn[v]) swap(u, v);
     return low[v] > dfn[u];
   }
   vector<vector<int>> BCC_edge() {
@@ -87,8 +81,7 @@ struct Tarjan_BCC {
       vis[u] = true, tmp.emplace_back(u);
       for (auto id : E[u]) {
         auto v = edges[id].first ^ edges[id].second ^ u;
-        if (!is_bridge(u, v) && !vis[v])
-          dfs(v);
+        if (!is_bridge(u, v) && !vis[v]) dfs(v);
       }
     };
     for (int i = 0; i < n; ++i) {
