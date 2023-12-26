@@ -1,6 +1,4 @@
 #include <bits/stdc++.h>
-
-#include <utility>
 // #define ONLINE_JUDGE
 #ifndef ONLINE_JUDGE
 #include "dbg.h"
@@ -9,94 +7,7 @@
 #endif
 using namespace std;
 using ll = long long;
-
 constexpr int N = 20;
-using node = array<int, N>;
-void insert(node &p, int x) {
-  if (x == 0)
-    return;
-  for (int i = N - 1; i >= 0; --i) {
-    if (!(x >> i))
-      continue;
-    if (!p[i]) {
-      p[i] = x;
-      break;
-    }
-    x ^= p[i];
-  }
-}
-bool find(node &p, int x) {
-  if (x == 0)
-    return true;
-  for (int i = N - 1; i >= 0; --i) {
-    if (!(x >> i))
-      continue;
-    if (!p[i]) {
-      return false;
-    }
-    x ^= p[i];
-  }
-  return true;
-}
-void merge(node &l, const node &r) {
-  bool flag = true;
-  for (int i = 0; i < N; ++i) {
-    if (l[i] == 0) {
-      flag = false;
-      break;
-    }
-  }
-  if (flag)
-    return;
-  for (int i = N - 1; i >= 0; --i) {
-    insert(l, r[i]);
-  }
-}
-class SparseTable {
-  using T = node;
-  using VT = vector<T>;
-  using VVT = vector<VT>;
-  VVT ST;
-  vector<int> LOG, POW;
-  T tmp;
-  T op(const T &t1, const T &t2) {
-    tmp = t1;
-    merge(tmp, t2);
-    return tmp;
-  }
-
-public:
-  SparseTable() {}
-  SparseTable(const vector<T> &v) {
-    int len = (int)v.size(), l1 = (int)ceil(log2(len)) + 1;
-    ST = VVT(len, VT(l1));
-    LOG = vector<int>(len + 1, 0);
-    POW = vector<int>(len + 1, 1);
-    for (int i = 0; i < len; ++i) {
-      ST[i][0] = v[i];
-      if (i > 0 && i <= 30) {
-        POW[i] = POW[i - 1] * 2;
-      }
-    }
-    for (int i = 2; i <= len; ++i) {
-      LOG[i] = LOG[i / 2] + 1;
-    }
-    for (int j = 1; j < l1; ++j) {
-      int pj = (1 << (j - 1));
-      for (int i = 0; i + pj < len; ++i) {
-        ST[i][j] = ST[i][j - 1];
-        merge(ST[i][j], ST[i + (1 << (j - 1))][j - 1]);
-      }
-    }
-  }
-  T query(int l, int r) {
-    int lt = r - l + 1;
-    int q = LOG[lt];
-    dbg(ST[l][q], ST[r - POW[q] + 1][q]);
-    return op(ST[l][q], ST[r - POW[q] + 1][q]);
-  }
-};
-SparseTable sp;
 struct heavy_light_decomposition {
   int n, m, s, tot;
   vector<int> fa, dep, siz, son, top, dfn, rnk;
@@ -141,56 +52,153 @@ struct heavy_light_decomposition {
         v = fa[top[v]];
     return dep[u] > dep[v] ? v : u;
   }
-  node newLCA(int u, int v) {
-    node val;
-    fill(val.begin(), val.end(), 0);
-    while (top[u] != top[v]) {
-      if (dep[top[u]] > dep[top[v]]) {
-        merge(val, sp.query(dfn[top[u]], dfn[u]));
-        u = fa[top[u]];
-      } else {
-        merge(val, sp.query(dfn[top[v]], dfn[v]));
-        v = fa[top[v]];
+};
+struct XORBase {
+  array<int, N> p;
+  deque<pair<int, int>> used;
+  XORBase() {
+    fill(p.begin(), p.end(), 0);
+    used.clear();
+  }
+  bool find(int u) {
+    for (int i = N - 1; i >= 0; --i) {
+      if (!(u >> i))
+        continue;
+      if (!p[i])
+        return false;
+      u ^= p[i];
+    }
+    return true;
+  }
+  void insert(const int u, int id) {
+    int tmp = u;
+    used.emplace_back(u, id);
+    for (int i = N - 1; i >= 0; --i) {
+      if (!(tmp >> i))
+        continue;
+      if (!p[i]) {
+        p[i] = tmp;
+        return;
+      }
+      tmp ^= p[i];
+    }
+    fill(p.begin(), p.end(), 0);
+    deque<pair<int, int>> aft;
+    for (auto [nu, nid] : ranges::views::reverse(used)) {
+      tmp = nu;
+      bool flag = false;
+      for (int i = N - 1; i >= 0; --i) {
+        if (!(tmp >> i))
+          continue;
+        if (!p[i]) {
+          p[i] = tmp;
+          flag = true;
+          break;
+        }
+        tmp ^= p[i];
+      }
+      if (flag) {
+        aft.emplace_front(nu, nid);
       }
     }
-    if (dep[u] > dep[v]) {
-      merge(val, sp.query(dfn[v], dfn[u]));
-    } else {
-      merge(val, sp.query(dfn[u], dfn[v]));
+    swap(aft, used);
+  }
+  array<int, N> newBase(int id) {
+    array<int, N> bs;
+    fill(bs.begin(), bs.end(), 0);
+    for (auto [u, nid] : ranges::views::reverse(used)) {
+      if (nid < id)
+        break;
+      for (int i = N - 1; i >= 0; --i) {
+        if (!(u >> i))
+          continue;
+        if (!bs[i]) {
+          bs[i] = u;
+          break;
+        }
+        u ^= bs[i];
+      }
     }
-    return val;
+    return bs;
   }
 };
-
+void insert(array<int, N> &x, int u) {
+  int tmp = u;
+  for (int i = N - 1; i >= 0; --i) {
+    if (!(tmp >> i))
+      continue;
+    if (!x[i]) {
+      x[i] = tmp;
+      return;
+    }
+    tmp ^= x[i];
+  }
+}
+array<int, N> merge(const array<int, N> &x, const array<int, N> &y) {
+  array<int, N> nw;
+  fill(nw.begin(), nw.end(), 0);
+  for (auto i : x) {
+    if (i == 0)
+      continue;
+    insert(nw, i);
+  }
+  for (auto i : y) {
+    if (i == 0)
+      continue;
+    insert(nw, i);
+  }
+  return nw;
+}
+bool find(int u, const array<int, N> &p) {
+  for (int i = N - 1; i >= 0; --i) {
+    if (!(u >> i))
+      continue;
+    if (!p[i])
+      return false;
+    u ^= p[i];
+  }
+  return true;
+}
 auto solve() {
   int n;
   cin >> n;
   vector<int> a(n);
   for (auto &i : a)
     cin >> i;
+  vector<vector<int>> E(n);
   heavy_light_decomposition hld(n);
-  for (int i = 1; i < n; ++i) {
+  for ([[maybe_unused]] auto _ : ranges::views::iota(1, n)) {
     int u, v;
     cin >> u >> v;
     u--, v--;
     hld.add_edge(u, v);
+    E[u].emplace_back(v);
+    E[v].emplace_back(u);
   }
   hld.tree_build(0);
   hld.tree_decomposition(0, 0);
-  vector<node> b(n);
-  for (int i = 0; i < n; ++i) {
-    insert(b[hld.dfn[i]], a[i]);
-  }
-  sp = SparseTable(b);
+  vector<XORBase> bs(n);
+  function<void(int, int)> dfs = [&](int u, int fa) {
+    bs[u].insert(a[u], hld.dfn[u]);
+    for (auto v : E[u]) {
+      if (v == fa)
+        continue;
+      bs[v] = bs[u];
+      dfs(v, u);
+    }
+  };
+  dfs(0, 0);
   int q;
   cin >> q;
   while (q--) {
-    int x, y, k;
-    cin >> x >> y >> k;
-    x--, y--;
-    node tmp = hld.newLCA(x, y);
-    dbg(tmp);
-    if (find(tmp, k)) {
+    int u, v, k;
+    cin >> u >> v >> k;
+    u--, v--;
+    int fa = hld.lca(u, v);
+    auto lef = bs[u].newBase(hld.dfn[fa]);
+    auto rig = bs[v].newBase(hld.dfn[fa]);
+    auto nw = merge(lef, rig);
+    if (find(k, nw)) {
       cout << "YES\n";
     } else {
       cout << "NO\n";
