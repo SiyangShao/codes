@@ -1,4 +1,3 @@
-// 我相信我相信的一切
 #include <bits/stdc++.h>
 // #define ONLINE_JUDGE
 #ifndef ONLINE_JUDGE
@@ -9,24 +8,15 @@
 using namespace std;
 using ll = long long;
 auto solve() {
-  int n, k;
-  cin >> n >> k;
-  vector<ll> b(n);
-  for (auto &i : b)
-    cin >> i;
-  ll ans = 1;
-  for (auto i : b) {
-    ans *= i;
-  }
-  if (2023 % ans == 0) {
-    cout << "YES\n";
-    cout << 2023 / ans;
-    for (int i = 1; i < k; ++i) {
-      cout << " 1";
-    }
-    cout << "\n";
+  ll a, b;
+  cin >> a >> b;
+  ll base = gcd(a, b);
+  if (base != b) {
+    cout << base << "\n";
   } else {
-    cout << "NO\n";
+    assert(b % a == 0);
+    ll div = b / a;
+    cout << b * div << "\n";
   }
 }
 auto main() -> int {
