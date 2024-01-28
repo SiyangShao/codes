@@ -18,7 +18,8 @@ template <class Flow> struct dinic {
     E[u].emplace_back(id), E[v].emplace_back(id ^ 1);
   }
   auto dfs(int u, int t, Flow flow) {
-    if (u == t) return flow;
+    if (u == t)
+      return flow;
     Flow sum = 0;
     while (cur[u] < (int)E[u].size()) {
       auto id = E[u][cur[u]];
@@ -28,10 +29,12 @@ template <class Flow> struct dinic {
         auto add = dfs(v, t, c);
         sum += add, flow -= add, edg[id].f -= add, edg[id ^ 1].f += add;
       }
-      if (!flow) break;
+      if (!flow)
+        break;
       cur[u]++;
     }
-    if (!sum) d[u] = -1;
+    if (!sum)
+      d[u] = -1;
     return sum;
   }
   bool level(int s, int t) {
@@ -43,14 +46,16 @@ template <class Flow> struct dinic {
       Q.pop();
       for (auto id : E[u]) {
         auto v = edg[id].v;
-        if (d[v] == -1 && edg[id].f != 0) Q.emplace(v), d[v] = d[u] + 1;
+        if (d[v] == -1 && edg[id].f != 0)
+          Q.emplace(v), d[v] = d[u] + 1;
       }
     }
     return d[t] != -1;
   }
   auto solve(int s, int t) {
     Flow ans = 0;
-    while (level(s, t)) ans += dfs(s, t, inf);
+    while (level(s, t))
+      ans += dfs(s, t, inf);
     return ans;
   }
 };
