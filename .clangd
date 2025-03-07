@@ -1,0 +1,35 @@
+CompileFlags:
+  Add: [-Wall, -Wno-documentation, -Wno-missing-prototypes]
+
+If:
+  PathExclude: .*\.(c|h)$
+
+ElseIf:
+  PathMatch: .*\.(cpp|cxx|cc)$
+  CompileFlags:
+    Add: [-std=c++20]
+
+ElseIf:
+  PathMatch: .*\.c$
+  CompileFlags:
+    Add: [-std=c11]
+
+Diagnostics:
+  UnusedIncludes: None
+
+  ClangTidy:
+    Add:
+      [
+        performance-*,
+        bugprone-*,
+        portability-*,
+        modernize-*,
+      ]
+    Remove:
+      [
+        modernize-use-trailing-return-type,
+        bugprone-easily-swappable-parameters,
+        # bugprone-narrowing-conversions,
+      ]
+    CheckOptions:
+      WarnOnFloatingPointNarrowingConversion: false
